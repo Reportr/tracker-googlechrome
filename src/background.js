@@ -24,12 +24,17 @@ var start = function(data) {
 
 
 chrome.history.onVisited.addListener(function(item) {
-    console.log("Track visit ", item.url);
+    console.log("Track visit ", item);
+
+    var matches = item.url.match(/^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i);
+    var domain = matches && matches[1];
+
     doRequest("POST", "events", {
         'type': "chrome.visit",
         'properties': {
             "url": item.url,
-            "title": item.title
+            "title": item.title,
+            'domain': domain
         }
     });
 });
