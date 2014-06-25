@@ -1,4 +1,4 @@
-tracker-googlechrome
+Google Chroem Tracker
 ====================
 
-Web navigation tracker for google chrome
+A Google Chrome extension to track your web navigation to Reportr.
