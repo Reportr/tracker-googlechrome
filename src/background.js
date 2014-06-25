@@ -6,7 +6,7 @@ var doRequest = function(method, path, body, callback) {
     xhr.setRequestHeader("Content-type","application/json");
     xhr.setRequestHeader("Authorization", "Basic " + btoa(config.username + ":" + config.password));
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
+        if (xhr.readyState == 4 && callback) {
             callback();
         }
     }
