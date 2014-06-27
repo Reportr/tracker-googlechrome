@@ -1,4 +1,6 @@
 var config = {};
+var position = null;
+
 
 var doRequest = function(method, path, body, callback) {
     var xhr = new XMLHttpRequest();
@@ -13,6 +15,15 @@ var doRequest = function(method, path, body, callback) {
     xhr.send(body? JSON.stringify(body) : undefined);
 };
 
+var updatePosition = function() {
+    navigator.geolocation.getCurrentPosition(function(_position) {
+        position = _position;
+    }, function(positionError) {
+        position = null;
+        console.error(positionError);
+    });
+};
+
 var start = function(data) {
     if (!data.host || !data.username || !data.password) {
         console.error("Invalid settings", data);
@@ -22,20 +33,32 @@ var start = function(data) {
     config = data;
 };
 
+// Get geo position
+setTimeout(updatePosition, 5*60*1000);
+updatePosition();
+
 
 chrome.history.onVisited.addListener(function(item) {
     console.log("Track visit ", item);
 
     var matches = item.url.match(/^https?\:\/\/([^\/:?#]+)(?:[\/:?#]|$)/i);
-    var domain = matches && matches[1];
+    var properties = {
+        "url": item.url,
+        "title": item.title,
+        'domain': matches && matches[1]
+    };
+
+    if (position) {
+        properties.position = {
+            accuracy: position.coords.accuracy,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        };
+    }
 
     doRequest("POST", "events", {
         'type': "chrome.visit",
-        'properties': {
-            "url": item.url,
-            "title": item.title,
-            'domain': domain
-        }
+        'properties': properties
     });
 });
 chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -47,3 +70,5 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 chrome.storage.sync.get(['host', 'username', 'password'], function(data) {
     start(data)
 });
+
+

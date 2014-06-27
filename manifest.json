@@ -9,7 +9,7 @@
     "content_security_policy": "script-src 'self' 'unsafe-eval' https://ajax.googleapis.com; object-src 'self'",
     "permissions": [
         "http://*/",
-        "history", "storage"
+        "history", "storage", "geolocation"
     ],
     "browser_action": {
         "default_icon": "icon.png",
